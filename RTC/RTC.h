@@ -10,8 +10,9 @@ public:
 
   void request_time() {
     Wire.beginTransmission(DS3231_ADDRESS);
-    Wire.write(0);
+    Wire.write(0x00);
     Wire.endTransmission();
+    // Serial.println("hello");
 
     Wire.requestFrom(DS3231_ADDRESS, 3);
 
@@ -19,6 +20,7 @@ public:
       seconds_raw = Wire.read();
       minutes_raw = Wire.read();
       hours_raw = Wire.read();
+      // Serial.println(seconds_raw);
     }
 
     seconds = (seconds_raw >> 4) * 10 + (seconds_raw & 0b00001111);

@@ -42,14 +42,20 @@ public:
   }
 
   void compute() {
+
     float error = setpoint - input;
     if (!_direction) error = -error;
-    _I += error * _dt;
-    _D = (error - _prev_error) / _dt;
+    _I = constrain(_I + (float)error * (millis() - _prevTime) / 1000 * ki, _min_out, _max_out);
+    _D = (error - _prev_error) / (millis() - _prevTime) / 1000;
+
     if (!_direction) _D = -_D;
 
-    _output = constrain(error * kp + _I * ki + _D * kd, _min_out, _max_out);
+    _output = constrain(error * kp + _I  + _D * kd, _min_out, _max_out);
+    if (!ki) _output = constrain(error * kp + _D * kd, _min_out, _max_out);
     _prev_error = error;
+    _prevTime = millis();
+    
+    
   }
 
 
@@ -59,5 +65,6 @@ private:
   float _I, _D;
   float _output;
   bool _direction = 1;
+  uint32_t _prevTime;
   int16_t _max_out = 32767, _min_out = -32768;
 };
